@@ -2,53 +2,71 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from datetime import datetime
-# Create your views here.
-
-
+from luxmed.LuxMedAPI.LuxmedAPI import LuxMedSniper
 from .forms import NameForm
-def hello_there(request):
-   # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = NameForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
-            return HttpResponseRedirect('/thanks/')
 
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = NameForm()
-    return render(request, 'luxmed/hello_there.html', {'form': form})
 
 
 
 def home(request):
+    if 'username' in request.session:
         return render(request, "luxmed/home.html")
+    else:
+        return render(request, 'luxmed/Index.html')
 
-def about(request):
-    return render(request, "luxmed/about.html")
+def Index(request):
+    return render(request, 'luxmed/Index.html')
+
+
+
+def AddVisit(request):
+        return render(request, "luxmed/AddVisit.html")
 
 def contact(request):
-    return render(request, "luxmed/contact.html")
-
+        return render(request, 'luxmed/contact.html')
 
 def ValidateUser(request):
     if request.method == 'POST':
+            try:
+                del request.session['username']
+            except:
+                pass
+
             # create a form instance and populate it with data from the request:
             form = NameForm(request.POST)
             # check whether it's valid:
             if form.is_valid():
-               
+                test = LuxMedSniper()
+                test.LUXemail = form.cleaned_data['your_name']
+                test.LUXpassword = form.cleaned_data['your_pass']
+                test._createSession()
+                test._logIn()
 
-                if form.cleaned_data['your_name'] == 'Majki' and form.cleaned_data['your_pass'] == 'Majki':
-                    return HttpResponse("Welcome Majki")
+                if test.LoginStatus==True:
+                    request.session['username'] = test.LUXemail
+                    request.session['userpass'] = test.LUXpassword
+                    return render(request, "luxmed/home.html", {"username" : test.LUXemail})
                 else:
-                    return HttpResponse('not authorized')
+                    return render(request, "luxmed/error.html")
             else:
-                return render(request, "luxmed/contact.html")
+                return render(request, "luxmed/error.html")
     else:    
         form = NameForm()
-        return render(request, 'luxmed/hello_there.html', {'form': form})
+        return render(request, 'luxmed/login.html', {'form': form})
+
+
+
+def login(request):
+    form = NameForm()
+    return render(request, 'luxmed/login.html', {'form': form})
+
+def logout(request):
+    try:
+        del request.session['username']
+    except:
+        pass
+    return render(request, 'luxmed/Index.html')
+
+def error(request):
+    del request.session['username']
+    return render(request, 'luxmed/error.html')

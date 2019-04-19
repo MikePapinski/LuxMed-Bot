@@ -7,28 +7,23 @@ import os
 import datetime
 import shelve
 import time
-import coloredlogs
-import schedule
-import pushover
 
 
-# Setup logging
-coloredlogs.install(level="INFO")
-log = logging.getLogger("main")
 
 
-class LuxMedSniper:
+
+class LuxMedSniper():
     LUXMED_LOGIN_URL = 'https://portalpacjenta.luxmed.pl/PatientPortal/Account/LogIn'
     LUXMED_LOGOUT_URL = 'https://portalpacjenta.luxmed.pl/PatientPortal/Account/LogOn'
     MAIN_PAGE_URL = 'https://portalpacjenta.luxmed.pl/PatientPortal'
     REQUEST_RESERVATION_URL = 'https://portalpacjenta.luxmed.pl/PatientPortal/Reservations/Reservation/PartialSearch'
     LUXemail= "papinski.mike@gmail.com"
     LUXpassword= "Dupa1234"
+    LoginStatus = False
 
-    def __init__(self, configuration_file="luxmedSniper.yaml"):
+   # def __init__(self):
 
-        self._createSession()
-        self._logIn()
+
 
     def _createSession(self):
         self.session = requests.session()
@@ -44,12 +39,11 @@ class LuxMedSniper:
         login_data = {'LogIn': self.LUXemail, 'Password': self.LUXpassword}
         resp = self.session.post(self.LUXMED_LOGIN_URL, login_data)
         if resp.text.find('Nieprawidłowy login lub hasło.') != -1:
-            raise Exception("Login or password is incorrect")
-        soup = BeautifulSoup(resp.text, "html.parser")
-        self.requestVerificationToken = soup.find('input', {'name': '__RequestVerificationToken'}).get('value')
-        print("Successfully logged in! (RequestVerificationToken: {token}".format(
-            token=self.requestVerificationToken
-        ))
+            self.LoginStatus = False
+        else:
+            soup = BeautifulSoup(resp.text, "html.parser")
+            self.requestVerificationToken = soup.find('input', {'name': '__RequestVerificationToken'}).get('value')
+            self.LoginStatus = True
 
     def _parseVisits(self, page_data):
         s = BeautifulSoup(page_data, "html.parser")
