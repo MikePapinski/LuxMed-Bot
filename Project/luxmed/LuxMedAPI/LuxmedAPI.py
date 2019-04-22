@@ -7,6 +7,7 @@ import os
 import datetime
 import shelve
 import time
+from datetime import date
 
 
 
@@ -17,9 +18,12 @@ class LuxMedSniper():
     LUXMED_LOGOUT_URL = 'https://portalpacjenta.luxmed.pl/PatientPortal/Account/LogOn'
     MAIN_PAGE_URL = 'https://portalpacjenta.luxmed.pl/PatientPortal'
     REQUEST_RESERVATION_URL = 'https://portalpacjenta.luxmed.pl/PatientPortal/Reservations/Reservation/PartialSearch'
-    LUXemail= "papinski.mike@gmail.com"
-    LUXpassword= "Dupa1234"
+    LUXemail= ""
+    LUXpassword= ""
     LoginStatus = False
+
+    Find_Location = ""
+    Find_Service = ""
 
    # def __init__(self):
 
@@ -77,29 +81,32 @@ class LuxMedSniper():
             data = {
                 '__RequestVerificationToken': self.requestVerificationToken,
                 'DateOption': 'SelectedDate',
-                'FilterType': 'Ffs',
-                'CoordinationActivityId': 0,
-                'IsFFS': 'True',
+                'FilterType': 'Coordination',
+                'CoordinationActivityId': 16,
+                'IsFFS': 'False',
                 'MaxPeriodLength': 0,
-                'IsDisabled': 'True',
+                'IsDisabled': 'False',
                 'PayersCount': 0,
-                'FromDate': datetime.datetime.now().strftime("%d.%m.%Y"),
-                'ToDate': datetime.datetime.now() + datetime.timedelta(14),
-                'DefaultSearchPeriod': 14,
-                'CustomRangeSelected': 'True',
-                'SelectedSearchPeriod': 14,
-                'CityId': 45,
+                'FromDate': date.today(),
+                'ToDate': date.today() + datetime.timedelta(days=90),
+                'DefaultSearchPeriod': 90,
+                'CustomRangeSelected': 'False',
+                'SelectedSearchPeriod': 90,
+                'CityId': self.Find_Location,
                 'DateRangePickerButtonDefaultLabel': 'Inny zakres',
-                'ServiceId': 6621,
-                'TimeOption': 0,
-                'PayerId': '',
-                'LanguageId': ''}
+                'ServiceId': self.Find_Service,
+                'TimeOption': 3,
+                'PayerId': 0,
+                'LanguageId': ''
+                }
 
             data['ClinicId'] = -1
 
             data['DoctorMultiIdentyfier'] = -1
 
             r = self.session.post(self.REQUEST_RESERVATION_URL, data)
+
+            
             return self._parseVisits(r.text)
 
 

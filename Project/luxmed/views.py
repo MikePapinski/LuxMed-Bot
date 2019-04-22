@@ -10,7 +10,13 @@ from .models import MyTask
 from django.utils.timezone import utc
 
 
+def QueryLuxMedt_Task():
+    task_list = MyTask.objects.all()
 
+    for MyObject in task_list:
+        MyObject.GetNewVisit()
+        MyObject.save()
+    return True
 
 def home(request):
     if 'username' in request.session:
@@ -19,6 +25,8 @@ def home(request):
         test2 = task_list[::-1]
         # To return a new list, use the sorted() built-in function...
         # = sorted(task_list, key=lambda x: x.count, reverse=True)
+
+        QueryLuxMedt_Task()
 
         page = request.GET.get('page', 1)
         paginator = Paginator(test2, 10)
@@ -66,6 +74,7 @@ def AddVisit(request):
             #testos.VisitDate = '2019-01-01 11:11'
             #testos.LastCheck = '2019-01-01 11:11'
             testos.save() 
+            
 
             return HttpResponseRedirect('/home/')
             #return home(request) 
@@ -101,6 +110,7 @@ def ValidateUser(request):
                 if test.LoginStatus==True:
                     request.session['username'] = test.LUXemail
                     request.session['userpass'] = test.LUXpassword
+ 
                     return render(request, "luxmed/home.html", {"username" : test.LUXemail})
                 else:
                     return render(request, "luxmed/error.html")
