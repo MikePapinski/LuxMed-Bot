@@ -7,6 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
+
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}"/>
     <link rel="stylesheet" type="text/css" href="{% static 'css/scrolling-nav.css' %}"/>
@@ -26,7 +27,7 @@
           <ul class="navbar-nav ml-auto">
                 {% if request.session.username %}
                 <li class="nav-item">
-                  <a href="{% url 'contact' %}" class="nav-link js-scroll-trigger">Add Visit</a>
+                  <a href="{% url 'AddVisit' %}" class="nav-link js-scroll-trigger">Add Visit</a>
                 </li>
                 {% endif %}
                 {% if not request.session.username %}

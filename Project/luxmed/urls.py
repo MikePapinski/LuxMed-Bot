@@ -1,5 +1,7 @@
 from django.urls import path
 from luxmed import views
+from django.urls import include
+from django.conf.urls import url
 
 urlpatterns = [
     path("", views.Index, name="Index"),
@@ -10,4 +12,5 @@ urlpatterns = [
     path("AddVisit/", views.AddVisit, name="AddVisit"),
     path("contact/", views.contact, name="contact"),
     path("ValidateUser/", views.ValidateUser, name="Validation"),
+    path("DeleteTask/", views.DeleteTask, name="DeleteTask"),
 ]
