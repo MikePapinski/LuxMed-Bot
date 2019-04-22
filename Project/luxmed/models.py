@@ -60,7 +60,7 @@ class MyTask(models.Model):
                     FinalDate = datetime.datetime.strptime(test1 , '%d-%m-%Y %H:%M')
                     self.VisitDate=FinalDate
                 
-                self.LastCheck = date.today()
+                self.LastCheck = datetime.datetime.now()
 
             return True
         else:

@@ -10,13 +10,6 @@ from .models import MyTask
 from django.utils.timezone import utc
 
 
-def QueryLuxMedt_Task():
-    task_list = MyTask.objects.all()
-
-    for MyObject in task_list:
-        MyObject.GetNewVisit()
-        MyObject.save()
-    return True
 
 def home(request):
     if 'username' in request.session:
@@ -26,7 +19,6 @@ def home(request):
         # To return a new list, use the sorted() built-in function...
         # = sorted(task_list, key=lambda x: x.count, reverse=True)
 
-        QueryLuxMedt_Task()
 
         page = request.GET.get('page', 1)
         paginator = Paginator(test2, 10)
