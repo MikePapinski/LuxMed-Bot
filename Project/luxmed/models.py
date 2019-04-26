@@ -3,6 +3,7 @@ from django.core.validators import RegexValidator
 from luxmed.LuxMedAPI.LuxmedAPI import LuxMedSniper
 import datetime
 from datetime import date
+from .WhatsApp import SendWhatsApp
 
 class LuxMedService(models.Model):
     LuxMedID = models.IntegerField()
@@ -45,21 +46,45 @@ class MyTask(models.Model):
         LuxMedConn.LUXpassword = self.UserPassword
         LuxMedConn._createSession()
         LuxMedConn._logIn()
-
         if LuxMedConn.LoginStatus==True:
-            
+
             LuxMedConn.Find_Location = self.City.LuxMedID
             LuxMedConn.Find_Service = self.Service.LuxMedID
 
             ImportedVisitList=LuxMedConn._getAppointments()
+            checker = True
+
             for a in ImportedVisitList:
                 test = a.get('AppointmentDate')
+                testt = a.get('DoctorName')
+                testtt = a.get('ClinicPublicName')
+                testttt = self.Service.ServiceName
+
                 test1 = test[len(test)-16:len(test)]
                 Timeer = datetime.datetime.strptime((test[len(test)-5:len(test)]), '%H:%M')
-                if (Timeer.time() > self.TimeFrom and Timeer.time() < self.TimeTo):
+
+                datecheck1 = datetime.datetime.strptime(test1 , '%d-%m-%Y %H:%M')
+                datecheck2 = self.VisitDate
+
+                
+                if self.VisitDate is None:
                     FinalDate = datetime.datetime.strptime(test1 , '%d-%m-%Y %H:%M')
                     self.VisitDate=FinalDate
-                
+                    checker = False
+
+                    SendWhatsApp(str(testt), str(test), str(testtt), str(testttt))
+                    
+                else: 
+                    if (Timeer.time() > self.TimeFrom) and (Timeer.time() < self.TimeTo) and (datecheck1.replace(tzinfo=None) < datecheck2.replace(tzinfo=None)) and checker == True:
+                        print(datecheck1)
+                        print(datecheck2)
+
+                        FinalDate = datetime.datetime.strptime(test1 , '%d-%m-%Y %H:%M')
+                        self.VisitDate=FinalDate
+                        checker = False
+
+                        SendWhatsApp(str(testt), str(test), str(testtt), str(testttt))
+
                 self.LastCheck = datetime.datetime.now()
 
             return True

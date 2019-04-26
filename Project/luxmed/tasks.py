@@ -9,4 +9,6 @@ def RefreshLuxMedVisits():
         MyObject.GetNewVisit()
         MyObject.save()
 
+    
+
     print('Job Done! - All visits refreshed') 

@@ -77,7 +77,9 @@ class LuxMedSniper():
         return appointments
 
     def _getAppointments(self):
-        
+            InsertDateFrom = date.today()
+            InsertDateTo = date.today() + datetime.timedelta(days=90) 
+
             data = {
                 '__RequestVerificationToken': self.requestVerificationToken,
                 'DateOption': 'SelectedDate',
@@ -87,15 +89,15 @@ class LuxMedSniper():
                 'MaxPeriodLength': 0,
                 'IsDisabled': 'False',
                 'PayersCount': 0,
-                'FromDate': date.today(),
-                'ToDate': date.today() + datetime.timedelta(days=90),
+                'FromDate': InsertDateFrom.strftime('%d.%m.%Y'),
+                'ToDate':  InsertDateTo.strftime('%d.%m.%Y'),
                 'DefaultSearchPeriod': 90,
                 'CustomRangeSelected': 'False',
                 'SelectedSearchPeriod': 90,
                 'CityId': self.Find_Location,
                 'DateRangePickerButtonDefaultLabel': 'Inny zakres',
                 'ServiceId': self.Find_Service,
-                'TimeOption': 3,
+                'TimeOption': 0,
                 'PayerId': 0,
                 'LanguageId': ''
                 }
@@ -103,9 +105,9 @@ class LuxMedSniper():
             data['ClinicId'] = -1
 
             data['DoctorMultiIdentyfier'] = -1
-
+       
             r = self.session.post(self.REQUEST_RESERVATION_URL, data)
-
+        
             
             return self._parseVisits(r.text)
 
