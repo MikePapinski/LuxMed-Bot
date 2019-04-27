@@ -4,7 +4,8 @@ from django.contrib.admin import widgets
 import datetime
 
 
-class NameForm(forms.Form):
+#Form to Login
+class LoginForm(forms.Form):
     your_name = forms.CharField(label='',max_length=100) 
     your_pass = forms.CharField(label='',max_length=100, widget=forms.PasswordInput())
 
@@ -17,18 +18,20 @@ class NameForm(forms.Form):
     your_name.widget.attrs['type'] = 'text'
     your_pass.widget.attrs['type'] = 'password'
 
+
+#Form to delete task
 class DeleteTaskForm(forms.Form):
     DeleteTaskID = forms.CharField(label='',max_length=100) 
 
 
 
-
+#Form to add 
 class VisitForm(forms.ModelForm):
     class Meta:
-        model = MyTask     
+        model = MyTask     # Create form from this model
         fields = ['UserEmail', 'UserPassword', 'City', 'Service','TimeFrom','TimeTo','WhatsappNr']
 
-        FRUIT_CHOICES= [
+        TIME_CHOICES= [
         ('07:00', '07:00'),
         ('07:15', '07:15'),
         ('07:30', '07:30'),
@@ -91,11 +94,11 @@ class VisitForm(forms.ModelForm):
         ('21:45', '21:45'),
         ]
 
-
+        #Add widgets
         widgets = {
             'UserPassword': forms.PasswordInput(),
-            'TimeFrom': forms.Select(choices=FRUIT_CHOICES),
-            'TimeTo': forms.Select(choices=FRUIT_CHOICES)
+            'TimeFrom': forms.Select(choices=TIME_CHOICES),
+            'TimeTo': forms.Select(choices=TIME_CHOICES)
             }
 
     def __init__(self, *args, **kwargs):

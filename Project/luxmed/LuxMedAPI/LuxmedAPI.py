@@ -13,7 +13,7 @@ from datetime import date
 
 
 
-class LuxMedSniper():
+class LuxMedConnector():
     LUXMED_LOGIN_URL = 'https://portalpacjenta.luxmed.pl/PatientPortal/Account/LogIn'
     LUXMED_LOGOUT_URL = 'https://portalpacjenta.luxmed.pl/PatientPortal/Account/LogOn'
     MAIN_PAGE_URL = 'https://portalpacjenta.luxmed.pl/PatientPortal'

@@ -2,27 +2,25 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from datetime import datetime
-from luxmed.LuxMedAPI.LuxmedAPI import LuxMedSniper
-from .forms import NameForm, VisitForm, DeleteTaskForm
+from luxmed.LuxMedAPI.LuxmedAPI import LuxMedConnector
+from .forms import VisitForm, DeleteTaskForm, LoginForm
 from .ImportCSV import Import_LuxMedCity, Import_LuxMedService
 from django.core.paginator import Paginator
 from .models import MyTask
 from django.utils.timezone import utc
 
 
-
+# Home View 
 def home(request):
     if 'username' in request.session:
 
+        #Get List of all tasks and revert it to get the newest on the top
         task_list = MyTask.objects.all()
-        test2 = task_list[::-1]
-        # To return a new list, use the sorted() built-in function...
-        # = sorted(task_list, key=lambda x: x.count, reverse=True)
+        task_list_reverted = task_list[::-1]
 
-
+        #Move List to pagination table
         page = request.GET.get('page', 1)
-        paginator = Paginator(test2, 10)
-
+        paginator = Paginator(task_list_reverted, 10)
         try:
             My_Tasks = paginator.page(page)
         except PageNotAnInteger:
@@ -30,101 +28,107 @@ def home(request):
         except EmptyPage:
             My_Tasks = paginator.page(paginator.num_pages)
 
-
+        #Return view to template
         return render(request, "luxmed/home.html", { 'My_Tasks': My_Tasks })
     else:
         return render(request, 'luxmed/Index.html')
 
+# View to process Task Deletaion
 def DeleteTask(request):
+    #Check if POST request
     if request.method == 'POST':
         form = DeleteTaskForm(request.POST)
-            # check whether it's valid:
+        #Check if form for delation is valid
         if form.is_valid():
             objectos = MyTask.objects.get(id=form.cleaned_data['DeleteTaskID'])
-            objectos.delete()
-
+            objectos.delete() # Delete task
+    #redirect to home view
     return HttpResponseRedirect('/home/')
 
 
-
+#Return the Index page (Entry Page)
 def Index(request):
     return render(request, 'luxmed/Index.html')
 
 
 
+#Add Task Visit View
 def AddVisit(request):
-    #Import_LuxMedCity()
-    #Import_LuxMedService()
+    #Check if POST request
     if request.method == 'POST':
         form = VisitForm(request.POST)
-            # check whether it's valid:
+        # check whether form it's valid:
         if form.is_valid():
-            testos = form.save(commit=False)
-            # commit=False tells Django that "Don't send this to database yet.
-            # I have more things I want to do with it."
-            #student.user = request.user # Set the user object here
-            #testos.VisitDate = '2019-01-01 11:11'
-            #testos.LastCheck = '2019-01-01 11:11'
-            testos.save() 
-            
-
+            AddViewForm = form.save(commit=False) # commit=False tells Django that "Don't send this to database yet.
+            AddViewForm.save()  # save to form to database          
+            #redirect to home
             return HttpResponseRedirect('/home/')
-            #return home(request) 
-
         else:
+            #Not a post request, return error view
             return render(request, 'luxmed/error.html')
 
     else:
+        # This is NOT a POST request - Return the form template
         initial = {'UserEmail': request.session['username'],'UserPassword': request.session['userpass']  }
         form = VisitForm(initial=initial)
+        #Return form
         return render(request, "luxmed/AddVisit.html", {'form': form})
 
+
+#Get the Contact view
 def contact(request):
     return render(request, 'luxmed/contact.html')
 
+#View to process user validation
 def ValidateUser(request):
+    # Check is POST request
     if request.method == 'POST':
+            # Delete user session if exists
             try:
                 del request.session['username']
             except:
                 pass
 
             # create a form instance and populate it with data from the request:
-            form = NameForm(request.POST)
-            # check whether it's valid:
+            form = LoginForm(request.POST)
+            # check whether form it's valid:
             if form.is_valid():
-                test = LuxMedSniper()
-                test.LUXemail = form.cleaned_data['your_name']
-                test.LUXpassword = form.cleaned_data['your_pass']
-                test._createSession()
-                test._logIn()
+                #Create the LuxMedConnector Object
+                NewUserSession = LuxMedConnector()
+                NewUserSession.LUXemail = form.cleaned_data['your_name'] # Pass the user name/email to LuxMedConnector
+                NewUserSession.LUXpassword = form.cleaned_data['your_pass'] #Pass the user password to LuxMedConnector
+                NewUserSession._createSession() #Create session
+                NewUserSession._logIn() #Login to LuxMed using user credentials
 
-                if test.LoginStatus==True:
-                    request.session['username'] = test.LUXemail
-                    request.session['userpass'] = test.LUXpassword
+                #Check if user logged in to LuxMed succesfully
+                if NewUserSession.LoginStatus==True:
+                    request.session['username'] = NewUserSession.LUXemail # Create session for user with Email data
+                    request.session['userpass'] = NewUserSession.LUXpassword # Create session for user with Pass data
  
-                    return render(request, "luxmed/home.html", {"username" : test.LUXemail})
+                    return render(request, "luxmed/home.html", {"username" : NewUserSession.LUXemail}) # Success - User logged in to LuxMed
                 else:
-                    return render(request, "luxmed/error.html")
+                    return render(request, "luxmed/error.html") # Error - User do not exist in LuxMed Portal
             else:
-                return render(request, "luxmed/error.html")
-    else:    
-        form = NameForm()
+                return render(request, "luxmed/error.html") # Error - The form is not valid
+    else:
+        # Not a POST request, redirect to login page    
+        form = LoginForm()
         return render(request, 'luxmed/login.html', {'form': form})
 
 
-
+#Get the login page
 def login(request):
-    form = NameForm()
+    form = LoginForm()
     return render(request, 'luxmed/login.html', {'form': form})
 
+#View to process logout request
 def logout(request):
     try:
-        del request.session['username']
+        del request.session['username'] # Delete session if exists
     except:
         pass
-    return render(request, 'luxmed/Index.html')
+    return render(request, 'luxmed/Index.html') # Redirect to Main Index Page
 
+#Return the error view
 def error(request):
-    del request.session['username']
     return render(request, 'luxmed/error.html')

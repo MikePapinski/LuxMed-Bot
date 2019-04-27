@@ -3,6 +3,7 @@ from luxmed import views
 from django.urls import include
 from django.conf.urls import url
 
+# My url paths
 urlpatterns = [
     path("", views.Index, name="Index"),
     path("login/", views.login, name="login"),

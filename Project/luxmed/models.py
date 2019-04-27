@@ -1,10 +1,12 @@
 from django.db import models
 from django.core.validators import RegexValidator
-from luxmed.LuxMedAPI.LuxmedAPI import LuxMedSniper
+from luxmed.LuxMedAPI.LuxmedAPI import LuxMedConnector
 import datetime
 from datetime import date
 from .WhatsApp import SendWhatsApp
+from phonenumber_field.modelfields import PhoneNumberField
 
+# SQL MODEL - Table with all LuxMed Services
 class LuxMedService(models.Model):
     LuxMedID = models.IntegerField()
     ServiceName = models.CharField(max_length=120)
@@ -15,6 +17,7 @@ class LuxMedService(models.Model):
     def __unicode__(self):
         return self.LuxMedID
 
+# SQL MODEL - Table with all LuxMed Locations
 class LuxMedLocation(models.Model):
     LuxMedID = models.IntegerField()
     LocationName = models.CharField(max_length=120)
@@ -26,8 +29,10 @@ class LuxMedLocation(models.Model):
         return self.LocationName
 
 
-
+# SQL MODEL - Table with all Tasks (Visits to look for)
 class MyTask(models.Model):
+
+    # Define the parameters of the Task Class
     UserEmail = models.CharField(max_length=120)
     UserPassword = models.CharField(max_length=120)
     City = models.ForeignKey(LuxMedLocation, on_delete=models.CASCADE)
@@ -36,60 +41,72 @@ class MyTask(models.Model):
     TimeTo = models.TimeField()
     VisitDate = models.DateTimeField(blank=True, null=True)
     LastCheck = models.DateTimeField(blank=True, null=True)
+    WhatsappNr = PhoneNumberField(null=False, blank=False, unique=True)
 
-    phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
-    WhatsappNr = models.CharField(validators=[phone_regex], max_length=17) # validators should be a list
-
+    #METHOD to refresh the task data - Check if there is a new visit on LuxMED
     def GetNewVisit(self):
-        LuxMedConn = LuxMedSniper()
+
+        #Create LuxMed connector class and login to LuxMed portal
+        LuxMedConn = LuxMedConnector()
         LuxMedConn.LUXemail = self.UserEmail
         LuxMedConn.LUXpassword = self.UserPassword
         LuxMedConn._createSession()
-        LuxMedConn._logIn()
+        LuxMedConn._logIn() 
+
+        #Check if login succesful
         if LuxMedConn.LoginStatus==True:
 
+            #Pass the City ID and Service ID to look for in LuxMed portal
             LuxMedConn.Find_Location = self.City.LuxMedID
             LuxMedConn.Find_Service = self.Service.LuxMedID
 
-            ImportedVisitList=LuxMedConn._getAppointments()
-            checker = True
+            #Get all visits for service and city from luxmed portal for next 90 days
+            ImportedVisitList = LuxMedConn._getAppointments()
 
-            for a in ImportedVisitList:
-                test = a.get('AppointmentDate')
-                testt = a.get('DoctorName')
-                testtt = a.get('ClinicPublicName')
-                testttt = self.Service.ServiceName
+            # Variable to Validate if the visit was found
+            VisitFound = False
 
-                test1 = test[len(test)-16:len(test)]
-                Timeer = datetime.datetime.strptime((test[len(test)-5:len(test)]), '%H:%M')
+            #Loop through all imported visits from LuxMed service
+            for VisitObject in ImportedVisitList:
 
-                datecheck1 = datetime.datetime.strptime(test1 , '%d-%m-%Y %H:%M')
-                datecheck2 = self.VisitDate
+                AppointmentDate = VisitObject.get('AppointmentDate') # Get the visit date
+                DoctorName = VisitObject.get('DoctorName') # Get the Doctor Name
+                ClinicPublicName = VisitObject.get('ClinicPublicName') # Get the City location name
+                AppointmentServiceName = self.Service.ServiceName # Get the Service name
+
+                # Extract the date value from string - Imported visit data
+                AppointmentDate = AppointmentDate[len(AppointmentDate)-16:len(AppointmentDate)] 
+                
+                # Extract the time value from a string - Imported visit data
+                AppointmentDate_Time = datetime.datetime.strptime((AppointmentDate[len(AppointmentDate)-5:len(AppointmentDate)]), '%H:%M')
+
+                # Prepare old and new Visits date times to compare 
+                DateCheck_New = datetime.datetime.strptime(AppointmentDate , '%d-%m-%Y %H:%M')
+                DateCheck_Old = self.VisitDate
 
                 
-                if self.VisitDate is None:
-                    FinalDate = datetime.datetime.strptime(test1 , '%d-%m-%Y %H:%M')
-                    self.VisitDate=FinalDate
-                    checker = False
-
-                    SendWhatsApp(str(testt), str(test), str(testtt), str(testttt))
+                # Compare:
+                if self.VisitDate is None: # If the visit is new - Import first date
+                    self.VisitDate=DateCheck_New
+                    VisitFound = True
                     
-                else: 
-                    if (Timeer.time() > self.TimeFrom) and (Timeer.time() < self.TimeTo) and (datecheck1.replace(tzinfo=None) < datecheck2.replace(tzinfo=None)) and checker == True:
-                        print(datecheck1)
-                        print(datecheck2)
+                    # Send WhatsApp message
+                    SendWhatsApp(str(DoctorName), str(AppointmentDate), str(ClinicPublicName), str(AppointmentServiceName), self.WhatsappNr.as_e164)
+                    
+                else: # Visit already found - Check if there is a new visit
+                    if (AppointmentDate_Time.time() > self.TimeFrom) and (AppointmentDate_Time.time() < self.TimeTo) and (DateCheck_New.replace(tzinfo=None) < DateCheck_Old.replace(tzinfo=None)) and VisitFound == False:
+                        self.VisitDate=DateCheck_New
+                        VisitFound = True
 
-                        FinalDate = datetime.datetime.strptime(test1 , '%d-%m-%Y %H:%M')
-                        self.VisitDate=FinalDate
-                        checker = False
+                        # Send WhatsApp message
+                        SendWhatsApp(str(DoctorName), str(AppointmentDate), str(ClinicPublicName), str(AppointmentServiceName), self.WhatsappNr.as_e164)
 
-                        SendWhatsApp(str(testt), str(test), str(testtt), str(testttt))
-
+                # Update the last check date for task
                 self.LastCheck = datetime.datetime.now()
 
-            return True
+            return True # Login to LuxMed portal succesful
         else:
-            return False
+            return False # Login to LuxMed portal failed
 
 
 

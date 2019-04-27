@@ -1,17 +1,22 @@
 # Download the helper library from https://www.twilio.com/docs/python/install
+# This twillio API module
 from twilio.rest import Client
 
-def SendWhatsApp(DoctorNameValue, DateTimeValue, CityValue, ServiceValue):
-    # Your Account Sid and Auth Token from twilio.com/console
-    # DANGER! This is insecure. See http://twil.io/secure
-    account_sid = 'YOUR SID'
-    auth_token = 'YOUR TOKEN'
+def SendWhatsApp(DoctorNameValue, DateTimeValue, CityValue, ServiceValue, PhoneNumber):
+
+    #Define the twilio SID and AUTH_TOKEN to process WhatsApp message:
+    account_sid = ''
+    auth_token = ''
+
+    #Connect to twilio service
     client = Client(account_sid, auth_token)
 
+    #Send WhatsApp message to via twilio
     message = client.messages.create(
                                 body='Hello from LuxMed-Bot! I found a new visit for you on: ' + str(DateTimeValue) + ', ' + ServiceValue + ', ' + DoctorNameValue + ', ' + CityValue,
-                                from_='whatsapp:+14155238886',
-                                to='whatsapp:+48884988538'
+                                from_='whatsapp:+14155238886', # Twilio test number - DO NOT CHANGE
+                                to='whatsapp:' + str(PhoneNumber) # Users phone number to receive message
                             )
 
-    print(message.sid)
+    # Print to confirm the message was sent
+    print(message.sid) 
