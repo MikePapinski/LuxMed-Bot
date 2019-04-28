@@ -109,10 +109,11 @@ def ValidateUser(request):
  
                     return render(request, "luxmed/home.html", {"username" : NewUserSession.LUXemail}) # Success - User logged in to LuxMed
                 else:
-                    return render(request, "luxmed/error.html") # Error - User do not exist in LuxMed Portal
+                    context= {'ErrorMsg': 'This user credentials do not exist in LuxMed.pl - please login to LuxMed.pl first.'}
+                    return render(request, "luxmed/error.html",context) # Error - User do not exist in LuxMed Portal
             else:
-
-                return render(request, "luxmed/error.html") # Error - The form is not valid
+                context= {'ErrorMsg': 'The form you submited is not valie, please check correctness of your data.'}
+                return render(request, "luxmed/error.html",context) # Error - The form is not valid
     else:
         # Not a POST request, redirect to login page    
         form = LoginForm()
