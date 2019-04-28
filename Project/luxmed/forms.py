@@ -2,6 +2,7 @@ from django import forms
 from luxmed.models import MyTask
 from django.contrib.admin import widgets
 import datetime
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 #Form to Login
@@ -28,6 +29,8 @@ class DeleteTaskForm(forms.Form):
 #Form to add 
 class VisitForm(forms.ModelForm):
     class Meta:
+
+
         model = MyTask     # Create form from this model
         fields = ['UserEmail', 'UserPassword', 'City', 'Service','TimeFrom','TimeTo','WhatsappNr']
 
@@ -94,6 +97,7 @@ class VisitForm(forms.ModelForm):
         ('21:45', '21:45'),
         ]
 
+     
         #Add widgets
         widgets = {
             'UserPassword': forms.PasswordInput(),
@@ -107,6 +111,8 @@ class VisitForm(forms.ModelForm):
         ch = [(X,X) for X in range(2005, d)]
         self.fields['TimeFrom'].choices = ch
         self.fields['TimeTo'].choices = ch
+        #WhatsappNr = PhoneNumberField()
+        
         
 
 

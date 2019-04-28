@@ -5,8 +5,29 @@ Contact
 {% endblock %}
 
 {% block content %}
-<p>Home page for the Visual Studio Code Django tutorial.</p>
 
-
+{% load static %} <!-- Prepare django to load static files -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/SocialMediaIcons.css' %}"/>
+    <section id="contact">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-8 mx-auto">
+              <h2>Contact me <icon style="color:#0066cc" class="fa fa-lg fa-comment "></icon></h2>
+              <p class="lead">Solution created by Mike Papinski.</p>
+              <p class="lead">Mp.Papinski@gmail.com</p>
+              
+              <div align="center" class="socialbtns">
+                <ul>
+                <li><a href="https://pl-pl.facebook.com/le.papis" class="fa fa-lg fa-facebook"></a></li>
+                <li><a href="https://github.com/MikePapinski" class="fa fa-lg fa-github"></a></li>
+                <li><a href="https://pl.linkedin.com/in/michal-papinski-bb4509179" class="fa fa-lg fa-linkedin"></a></li>
+                <li><a href="https://www.youtube.com/channel/UCl8p5FVdmBMiRLIqlSP-EmA" class="fa fa-lg fa-youtube"></a></li>
+                </ul>
+                </div>
+              
+            </div>
+          </div>
+        </div> 
+      </section>
 
 {% endblock %}

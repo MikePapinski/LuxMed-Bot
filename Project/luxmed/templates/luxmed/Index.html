@@ -5,12 +5,22 @@ Index
 {% endblock %}
 
 {% block content %}
+{% load static %}
 
 <header class="bg-primary text-white">
     <div class="container text-center">
-      <h1>Welcome to Scrolling Nav</h1>
-      <p class="lead">A landing page template freshly redesigned for Bootstrap 4</p>
+      <h1>Welcome to LuxMed Bot</h1>
+      <p class="lead">Never miss another visit at LuxMed.pl!</p>
+       <div align="center" class="socialbtns">
+            <ul>
+            <li><a href="#" class="fa fa-lg fa-user-md shadow-pop-tr"></a></li>
+            </ul>
+          
+        </div>
+
     </div>
+
+  
   </header>
 
   
@@ -18,13 +28,13 @@ Index
     <div class="container">
       <div class="row">
         <div class="col-lg-8 mx-auto">
-          <h2>About this page</h2>
-          <p class="lead">This is a great place to talk about your webpage. This template is purposefully unstyled so you can use it as a boilerplate or starting point for you own landing page designs! This template features:</p>
+          <h2>About LuxMed Bot <icon  style="color:#0066cc"   class="fa fa-lg fa-medkit"></icon></h2>
+          <p class="lead">This is simple Web App that connects with LuxMed.pl portal and moniotors visits for you. Avaliable features are:</p>
           <ul>
-            <li>Clickable nav links that smooth scroll to page sections</li>
-            <li>Responsive behavior when clicking nav links perfect for a one page website</li>
-            <li>Bootstrap's scrollspy feature which highlights which section of the page you're on in the navbar</li>
-            <li>Minimal custom CSS so you are free to explore your own unique design options</li>
+            <li>Searching for New Visits every 1 minute</li>
+            <li>Send instant notification via WhatsApp when new visit appears</li>
+            <li>Look for visits with predifened time range by the user</li>
+            <li>Notification when found visit disapears</li>
           </ul>
         </div>
       </div>
@@ -35,21 +45,36 @@ Index
     <div class="container">
       <div class="row">
         <div class="col-lg-8 mx-auto">
-          <h2>Services we offer</h2>
-          <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut optio velit inventore, expedita quo laboriosam possimus ea consequatur vitae, doloribus consequuntur ex. Nemo assumenda laborum vel, labore ut velit dignissimos.</p>
+          <h2>How does that work? <icon style="color:#0066cc"   class="fa fa-lg fa-gears"></icon></h2>
+          <p class="lead">The application is based on Python Django framework, Celery task schedules, Postgress database and all of this is dockerized in to standalone containers.</p>
         </div>
+        <img src={% static "Media/LuxMed-Bot-Graph-Docker.png" %}>
+        <img src={% static "Media/LuxMed-Bot-Graph-Connections.png" %}>
       </div>
     </div>
   </section>
-
+ 
+ 
   <section id="contact">
     <div class="container">
       <div class="row">
         <div class="col-lg-8 mx-auto">
-          <h2>Contact us</h2>
-          <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vero odio fugiat voluptatem dolor, provident officiis, id iusto! Obcaecati incidunt, qui nihil beatae magnam et repudiandae ipsa exercitationem, in, quo totam.</p>
+          <h2>Contact me <icon style="color:#0066cc" class="fa fa-lg fa-comment "></icon></h2>
+          <p class="lead">Solution created by Mike Papinski.</p>
+          <p class="lead">Mp.Papinski@gmail.com</p>
+          
+          <div align="center" class="socialbtns">
+            <ul>
+              <li><a href="https://pl-pl.facebook.com/le.papis" class="fa fa-lg fa-facebook"></a></li>
+              <li><a href="https://github.com/MikePapinski" class="fa fa-lg fa-github"></a></li>
+              <li><a href="https://pl.linkedin.com/in/michal-papinski-bb4509179" class="fa fa-lg fa-linkedin"></a></li>
+              <li><a href="https://www.youtube.com/channel/UCl8p5FVdmBMiRLIqlSP-EmA" class="fa fa-lg fa-youtube"></a></li>
+            </ul>
+            </div>
+          
         </div>
       </div>
-    </div>
+    </div> 
   </section>
+
 {% endblock %}

@@ -137,8 +137,9 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
 CELERY_BEAT_SCHEDULE = {
-    'hello': {
+    'LuxMedJob': {
         'task': 'luxmed.tasks.RefreshLuxMedVisits',
         'schedule': crontab()  # execute every minute
     }
 }
+

@@ -4,7 +4,6 @@ from django.http import HttpResponseRedirect
 from datetime import datetime
 from luxmed.LuxMedAPI.LuxmedAPI import LuxMedConnector
 from .forms import VisitForm, DeleteTaskForm, LoginForm
-from .ImportCSV import Import_LuxMedCity, Import_LuxMedService
 from django.core.paginator import Paginator
 from .models import MyTask
 from django.utils.timezone import utc
@@ -93,6 +92,9 @@ def ValidateUser(request):
             form = LoginForm(request.POST)
             # check whether form it's valid:
             if form.is_valid():
+
+
+            
                 #Create the LuxMedConnector Object
                 NewUserSession = LuxMedConnector()
                 NewUserSession.LUXemail = form.cleaned_data['your_name'] # Pass the user name/email to LuxMedConnector
@@ -109,6 +111,7 @@ def ValidateUser(request):
                 else:
                     return render(request, "luxmed/error.html") # Error - User do not exist in LuxMed Portal
             else:
+
                 return render(request, "luxmed/error.html") # Error - The form is not valid
     else:
         # Not a POST request, redirect to login page    

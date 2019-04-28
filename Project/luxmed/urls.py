@@ -12,6 +12,6 @@ urlpatterns = [
     path("home/", views.home, name="home"),
     path("AddVisit/", views.AddVisit, name="AddVisit"),
     path("contact/", views.contact, name="contact"),
-    path("ValidateUser/", views.ValidateUser, name="Validation"),
+    path("ValidateUser/", views.ValidateUser, name="ValidateUser"),
     path("DeleteTask/", views.DeleteTask, name="DeleteTask"),
 ]

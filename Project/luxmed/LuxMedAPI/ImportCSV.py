@@ -1,11 +1,12 @@
 import csv
 import sys
-from .models import LuxMedLocation,LuxMedService
+from ..models import LuxMedLocation, LuxMedService
+import os
 
 # Import LuxMedCity to SQL Database
 def Import_LuxMedCity():
 
-    with open('/code/Project/luxmed/LuxMedAPI/LuxMedCity.csv', 'r') as f:
+    with open(os.path.join(sys.path[0], "LuxMedCity.txt"), "r") as f:
         reader = csv.reader(f)
         for row in reader:
             MyCityObject = LuxMedLocation.objects.get_or_create(LuxMedID = row[0],LocationName = row[1])
@@ -13,7 +14,7 @@ def Import_LuxMedCity():
 # Import LuxMed Service to SQL Database
 def Import_LuxMedService():
 
-    with open('/code/Project/luxmed/LuxMedAPI/LuxMedService.csv', 'r') as f:
+    with open(os.path.join(sys.path[0], "LuxMedService.txt"), "r") as f:
         reader = csv.reader(f)
         for row in reader:
             MyServiceObject = LuxMedService.objects.get_or_create(LuxMedID = row[0],ServiceName = row[1])

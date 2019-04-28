@@ -2,7 +2,6 @@ from django.db import models
 from django.core.validators import RegexValidator
 from luxmed.LuxMedAPI.LuxmedAPI import LuxMedConnector
 import datetime
-from datetime import date
 from .WhatsApp import SendWhatsApp
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -41,8 +40,8 @@ class MyTask(models.Model):
     TimeTo = models.TimeField()
     VisitDate = models.DateTimeField(blank=True, null=True)
     LastCheck = models.DateTimeField(blank=True, null=True)
-    WhatsappNr = PhoneNumberField(null=False, blank=False, unique=True)
-
+    WhatsappNr = PhoneNumberField(null=False, blank=False, help_text='Notification phone number')
+   
     #METHOD to refresh the task data - Check if there is a new visit on LuxMED
     def GetNewVisit(self):
 
@@ -92,6 +91,7 @@ class MyTask(models.Model):
                     
                     # Send WhatsApp message
                     SendWhatsApp(str(DoctorName), str(AppointmentDate), str(ClinicPublicName), str(AppointmentServiceName), self.WhatsappNr.as_e164)
+                   # SendWhatsApp(str(DoctorName), str(AppointmentDate), str(ClinicPublicName), str(AppointmentServiceName), str(self.WhatsappNr))
                     
                 else: # Visit already found - Check if there is a new visit
                     if (AppointmentDate_Time.time() > self.TimeFrom) and (AppointmentDate_Time.time() < self.TimeTo) and (DateCheck_New.replace(tzinfo=None) < DateCheck_Old.replace(tzinfo=None)) and VisitFound == False:
@@ -100,8 +100,10 @@ class MyTask(models.Model):
 
                         # Send WhatsApp message
                         SendWhatsApp(str(DoctorName), str(AppointmentDate), str(ClinicPublicName), str(AppointmentServiceName), self.WhatsappNr.as_e164)
-
-                # Update the last check date for task
+                       # SendWhatsApp(str(DoctorName), str(AppointmentDate), str(ClinicPublicName), str(AppointmentServiceName), str(self.WhatsappNr))
+                                   
+               
+               # Update the last check date for task
                 self.LastCheck = datetime.datetime.now()
 
             return True # Login to LuxMed portal succesful
