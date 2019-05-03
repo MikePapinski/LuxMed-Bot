@@ -1,4 +1,5 @@
 # LuxMed-Bot
+![Logo](luxmed-bot-logo.png)
 
 A simple Python Django application to search for medical visits in LuxMed.pl portal.
 
@@ -93,6 +94,9 @@ dd685d1b321b        redis:alpine             "docker-entrypoint.s..."   5 days a
 localhost:8000
 ```
 ![Main dashboard](LuxMed-Bot-Screenshoot-1.png)
+![Login](LuxMed-Bot-Screenshoot-4.png)
+![Add Task](LuxMed-Bot-Screenshoot-3.png)
+![Task](LuxMed-Bot-Screenshoot-2.png)
 ## Running the tests
 
 This app has some simple unit test written to check if all end points work correct. To run the tests you need to run all the containers first.
