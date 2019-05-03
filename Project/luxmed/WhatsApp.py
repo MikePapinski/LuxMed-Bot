@@ -5,8 +5,8 @@ from twilio.rest import Client
 def SendWhatsApp(DoctorNameValue, DateTimeValue, CityValue, ServiceValue, PhoneNumber):
 
     #Define the twilio SID and AUTH_TOKEN to process WhatsApp message:
-    account_sid = 'ACcdf7b977980620c52d1be681fa30bf3c'
-    auth_token = '3bd9318e9c6036d2793d45a4069630a6'
+    account_sid = ''
+    auth_token = ''
 
     #Connect to twilio service
     client = Client(account_sid, auth_token)
